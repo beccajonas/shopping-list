@@ -4,6 +4,8 @@ const itemForm = document.getElementById('item-form');
 const itemInput = document.getElementById('item-input');
 const itemList = document.getElementById('item-list');
 const clearBtn = document.getElementById('clear');
+const itemFilter = document.getElementById('filter');
+
 
 
 function addItem(e) {
@@ -26,7 +28,10 @@ function addItem(e) {
     
     li.appendChild(button); // adding the icon, with button child to the li
 
+    // Add li to the DOM
     itemList.appendChild(li); // adding the li to the itemList
+
+    checkUI();
 
     itemInput.value = '';
 } 
@@ -47,13 +52,29 @@ function createIcon(classes) { // new function for adding x icon using HTML clas
 
 function removeItem(e) {
     if (e.target.parentElement.classList.contains('remove-item')) { // Using event delegation to target the button via the parent element // using contains method
+        if(confirm('Are you sure?')) {
         e.target.parentElement.parentElement.remove(); // Traversing the dom to be sure the LI is getting removed, not just the button
+        checkUI();
+        }
     }
 }
 
-function clearItems() {
-    while (itemList.firstChild) {
-        itemList.removeChild(itemList.firstChild);
+function clearItems() { 
+    while (itemList.firstChild) { // while loop that continues as long as there is a "first child" element within the itemList
+        itemList.removeChild(itemList.firstChild); // itemList.firstChild is used to access the first child element of the itemList
+    } 
+    checkUI();
+    // itemList.removeChild(itemList.firstChild) is removing the first child element from the itemList on each iteration of the loop.
+}
+
+function checkUI() {
+    const items = itemList.querySelectorAll('li');
+    if(items.length === 0) {
+        clearBtn.style.display = 'none';
+        itemFilter.style.display = 'none';
+    } else {
+        clearBtn.style.display = 'block';
+        itemFilter.style.display = 'block'; 
     }
 }
 
@@ -61,3 +82,5 @@ function clearItems() {
 itemForm.addEventListener('submit', addItem);
 itemList.addEventListener('click', removeItem); 
 clearBtn.addEventListener('click', clearItems);
+
+checkUI();
