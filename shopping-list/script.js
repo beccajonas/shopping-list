@@ -83,19 +83,43 @@ function getItemsFromStorage() {
     return itemsFromStorage;
 }
 
-function removeItem(e) {
-    if (e.target.parentElement.classList.contains('remove-item')) { // Using event delegation to target the button via the parent element // using contains method
-        if(confirm('Are you sure?')) {
-        e.target.parentElement.parentElement.remove(); // Traversing the dom to be sure the LI is getting removed, not just the button
-        checkUI();
-        }
+function onClickItem(e) {
+    if (e.target.parentElement.classList.contains
+        ('remove-item')) {
+        removeItem(e.target.parentElement.parentElement);
     }
+}
+
+function removeItem(item) {
+    if (confirm('Are you sure?')) {
+        // Remove item from DOM
+        item.remove();
+
+        // Remove item from storage
+        removeItemFromStorage(item.textContent);
+
+    checkUI();
+    }
+}
+
+function removeItemFromStorage(item) {
+    let itemsFromStorage = getItemsFromStorage();
+
+    // Filter out item to be removed
+    itemsFromStorage = itemsFromStorage.filter((i) => i !== item);
+
+    // Re-set to local storage
+    localStorage.setItem('items', JSON.stringify(itemsFromStorage));
+
 }
 
 function clearItems() { 
     while (itemList.firstChild) { // while loop that continues as long as there is a "first child" element within the itemList
         itemList.removeChild(itemList.firstChild); // itemList.firstChild is used to access the first child element of the itemList
     } 
+
+    // Clear from localStorage
+    localStorage.removeItem('items');
     checkUI();
     // itemList.removeChild(itemList.firstChild) is removing the first child element from the itemList on each iteration of the loop.
 }
@@ -129,7 +153,7 @@ function checkUI() { // function to display the filter and clear all button if t
 function init() {
 // Event Listeners
 itemForm.addEventListener('submit', onAddItemSubmit);
-itemList.addEventListener('click', removeItem); 
+itemList.addEventListener('click', onClickItem); 
 clearBtn.addEventListener('click', clearItems);
 itemFilter.addEventListener('input', filterItems);
 document.addEventListener('DOMContentLoaded', displayItems);
