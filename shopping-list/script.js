@@ -67,7 +67,22 @@ function clearItems() {
     // itemList.removeChild(itemList.firstChild) is removing the first child element from the itemList on each iteration of the loop.
 }
 
-function checkUI() {
+function filterItems(e) {
+    const items = itemList.querySelectorAll('li'); // querySeletorAll gives us a node list - can use forEach method
+    const text = e.target.value.toLowerCase();
+
+    items.forEach(item => {
+        const itemName = item.firstChild.textContent.toLowerCase();
+        if (itemName.indexOf(text) != -1) { // indexOf method - if it doesn't match it = -1, so we add ! 
+            item.style.display = 'flex'; // default to flex as seen in elements of DOM
+        } else {
+            item.style.display = 'none';
+        }
+    });
+    
+}
+
+function checkUI() { // function to display the filter and clear all button if there's lis 
     const items = itemList.querySelectorAll('li');
     if(items.length === 0) {
         clearBtn.style.display = 'none';
@@ -82,5 +97,7 @@ function checkUI() {
 itemForm.addEventListener('submit', addItem);
 itemList.addEventListener('click', removeItem); 
 clearBtn.addEventListener('click', clearItems);
+itemFilter.addEventListener('input', filterItems);
 
-checkUI();
+
+checkUI(); // Apply this to every function / scope needed throughout code 
