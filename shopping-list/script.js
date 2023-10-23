@@ -6,9 +6,13 @@ const itemList = document.getElementById('item-list');
 const clearBtn = document.getElementById('clear');
 const itemFilter = document.getElementById('filter');
 
+function displayItems() {
+    const itemsFromStorage = getItemsFromStorage();
+    itemsFromStorage.forEach(item => addItemToDOM(item));
+    checkUI();
+}
 
-
-function addItem(e) {
+function onAddItemSubmit(e) {
     // Call preventDefault because we don't want form submitting to file
     e.preventDefault();
 
@@ -19,10 +23,21 @@ function addItem(e) {
         alert('Please add an item');
         return; // Add return because we don't want anything else happening
     }
-    
-    // Create list item
+
+    // Create item DOM element
+    addItemToDOM(newItem);
+
+    // Add item to local storage
+    addItemToStorage(newItem);
+
+    checkUI();
+
+    itemInput.value = '';
+} 
+
+function addItemToDOM(item) {
     const li = document.createElement('li'); // create an list item
-    li.appendChild(document.createTextNode(newItem)); // appending a text node of the value of itemInput
+    li.appendChild(document.createTextNode(item)); // appending a text node of the value of itemInput
 
     const button = createButton('remove-item btn-link text-red'); // calling button with class that includes x icon
     
@@ -31,10 +46,7 @@ function addItem(e) {
     // Add li to the DOM
     itemList.appendChild(li); // adding the li to the itemList
 
-    checkUI();
-
-    itemInput.value = '';
-} 
+}
 
 function createButton(classes) { // new function for creating button using HTML classes
     const button = document.createElement('button');
@@ -48,6 +60,27 @@ function createIcon(classes) { // new function for adding x icon using HTML clas
     const icon = document.createElement('i');
     icon.className = classes;
     return icon;
+}
+
+function addItemToStorage(item) {
+    const itemsFromStorage = getItemsFromStorage()
+    
+    // Add new item to array
+    itemsFromStorage.push(item);
+
+    // Convert to JSON string and set to local storage
+    localStorage.setItem('items', JSON.stringify(itemsFromStorage));
+}
+
+function getItemsFromStorage() {
+    let itemsFromStorage; 
+
+    if(localStorage.getItem('items') === null) {
+        itemsFromStorage = []; 
+    } else { 
+        itemsFromStorage = JSON.parse(localStorage.getItem('items'));
+    }
+    return itemsFromStorage;
 }
 
 function removeItem(e) {
@@ -79,7 +112,6 @@ function filterItems(e) {
             item.style.display = 'none';
         }
     });
-    
 }
 
 function checkUI() { // function to display the filter and clear all button if there's lis 
@@ -93,11 +125,16 @@ function checkUI() { // function to display the filter and clear all button if t
     }
 }
 
+// Initialize app
+function init() {
 // Event Listeners
-itemForm.addEventListener('submit', addItem);
+itemForm.addEventListener('submit', onAddItemSubmit);
 itemList.addEventListener('click', removeItem); 
 clearBtn.addEventListener('click', clearItems);
 itemFilter.addEventListener('input', filterItems);
+document.addEventListener('DOMContentLoaded', displayItems);
 
+checkUI(); // Apply this to every function / scope needed throughout code
+}
 
-checkUI(); // Apply this to every function / scope needed throughout code 
+init();
